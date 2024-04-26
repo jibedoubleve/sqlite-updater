@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net7.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.35"/>
+        <PackageReference Include="FluentAssertions" Version="6.12.0"/>
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.4"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0"/>
+        <PackageReference Include="xunit" Version="2.7.1"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.8">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\System.SQLite.Updater\System.SQLite.Updater.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="TestAssets\script.0.1.0.sql"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Scripts\script-0.1.0.sql"/>
+        <EmbeddedResource Include="Scripts\script-0.2.0.sql"/>
+    </ItemGroup>
+
+</Project>
