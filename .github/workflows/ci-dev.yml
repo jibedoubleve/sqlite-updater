@@ -1,0 +1,21 @@
+# Whenever a tag is created on master and the version
+# is release (x.x.x-beta.x), trigger the build for TEST
+
+name: Release in TEST (beta)
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+-beta\.[0-9]+'
+jobs:
+  build:
+    name: Build and Test
+    runs-on: windows-latest
+    steps:
+      - name: Get the sources
+        uses: actions/checkout@v1
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          target: ci

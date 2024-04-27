@@ -62,3 +62,6 @@ create table settings (
   s_value text
 );
 ```
+## Licences
+
+📚 Icon used in this library is from [Noun Project](https://thenounproject.com/icon/database-846785/).

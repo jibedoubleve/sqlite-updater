@@ -4,11 +4,24 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TargetFramework>net7.0</TargetFramework>
+        <Authors>JB Wautier</Authors>
+        <Description>Opinionated library to automatically update SQLite database</Description>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageId>SQLiteDDLUpdater</PackageId>
+        <PackageProjectUrl>https://github.com/jibedoubleve/sqlite-updater</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/jibedoubleve/sqlite-updater/blob/develop/LICENSE</PackageLicenseUrl>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Dapper" Version="2.1.35"/>
         <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.4"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
     </ItemGroup>
 
 </Project>
