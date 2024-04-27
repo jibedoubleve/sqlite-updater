@@ -1,0 +1,58 @@
+﻿<wpf:ResourceDictionary xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xml:space="preserve">
+	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;
+    &lt;TypePattern DisplayName="Default Pattern"&gt;
+        &lt;Region Name="Fields"&gt;
+            &lt;Entry DisplayName="Fields"&gt;
+                &lt;Entry.Match&gt;                    
+                    &lt;Kind Is="Field" /&gt;
+                    &lt;Or&gt;
+                        &lt;Kind Is="Constant" /&gt;
+                    &lt;/Or&gt;
+                &lt;/Entry.Match&gt;
+                &lt;Entry.SortBy&gt;
+                    &lt;Access/&gt;
+                    &lt;Name/&gt;
+                &lt;/Entry.SortBy&gt;
+            &lt;/Entry&gt;
+        &lt;/Region&gt;
+
+        &lt;Region Name="Constructors"&gt;
+            &lt;Entry DisplayName="Constructors"&gt;
+                &lt;Entry.Match&gt;
+                    &lt;Kind Is="Constructor" /&gt;
+                &lt;/Entry.Match&gt;
+                &lt;Entry.SortBy&gt;
+                    &lt;Static /&gt;
+                    &lt;Access/&gt;
+                &lt;/Entry.SortBy&gt;
+            &lt;/Entry&gt;
+        &lt;/Region&gt;
+
+        &lt;Region Name="Properties"&gt;
+            &lt;Entry DisplayName="Properties"&gt;
+                &lt;Entry.Match&gt;
+                    &lt;Kind Is="Property" /&gt;
+                &lt;/Entry.Match&gt;
+                &lt;Entry.SortBy&gt;
+                    &lt;Access/&gt;
+                    &lt;Name/&gt;
+                &lt;/Entry.SortBy&gt;
+            &lt;/Entry&gt;
+        &lt;/Region&gt;
+
+        &lt;Region Name="Methods"&gt;
+            &lt;Entry DisplayName="Methods" Priority="100"&gt;
+                &lt;Entry.Match&gt;
+                    &lt;Kind Is="Method" /&gt;
+                &lt;/Entry.Match&gt;
+                &lt;Entry.SortBy&gt;
+                    &lt;Access/&gt;
+                    &lt;Name/&gt;
+                &lt;/Entry.SortBy&gt;
+            &lt;/Entry&gt;
+        &lt;/Region&gt;
+
+    &lt;/TypePattern&gt;
+&lt;/Patterns&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=SQ/@EntryIndexedValue">SQ</s:String></wpf:ResourceDictionary>
