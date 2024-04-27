@@ -17,7 +17,12 @@ using Spectre.Console
 /// ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 var repoName = "osteostudio";
-var solution = "./src/sqlite-updater.sln";
+
+// Paths
+var solution = "./sqlite-updater.sln";
+var project  = "./src/System.SQLite.Updater/System.SQLite.Updater.csproj";
+
+// Arguments
 var target   = Argument("target", "Default");
 
 GitVersion gitVersion;
@@ -37,19 +42,21 @@ Setup(ctx => {
         ArgumentCustomization = args => args.Append("/updateprojectfiles")
     });
     var branchName = gitVersion.BranchName;
+    var workingDirectory = System.IO.Directory.GetCurrentDirectory();
 
     AnsiConsole.Write(
         new FigletText($"{repoName}")
             .LeftJustified()
             .Color(Color.Red));
 
+    Information("Working directory         : {0}", workingDirectory);  
     Information("Branch                    : {0}", branchName);
     Information("Informational      Version: {0}", gitVersion.InformationalVersion);
     Information("SemVer             Version: {0}", gitVersion.SemVer);
     Information("AssemblySemVer     Version: {0}", gitVersion.AssemblySemVer);
     Information("AssemblySemFileVer Version: {0}", gitVersion.AssemblySemFileVer);
     Information("MajorMinorPatch    Version: {0}", gitVersion.MajorMinorPatch);
-    Information("NuGet              Version: {0}", gitVersion.NuGetVersion);  
+    Information("NuGet              Version: {0}", gitVersion.NuGetVersion);
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,13 +67,15 @@ Task("info").Does(()=> {
 });
 
 Task("clean").Does(()=> {
-    Information("Cleaning files...");
     var dirToDelete = GetDirectories("./**/obj")
                         .Concat(GetDirectories("./**/bin"))
                         .Concat(GetDirectories("./**/Output"))
                         .Concat(GetDirectories("./**/Publish"));
+    
+    Information("Deleting directories (bin, Output, Publish)...");
     DeleteDirectories(dirToDelete, new DeleteDirectorySettings{ Recursive = true, Force = true});
 
+    Information("Dotnet clean the solution...");
     DotNetTool(solution, "clean" );
 });
 
@@ -80,7 +89,7 @@ Task("build").Does(() => {
     );
 });
 
-Task("test").Does(() =>{
+Task("test").Does(() => {
     DotNetTool(
         solution,
         "test",
@@ -92,6 +101,28 @@ Task("post-clean").Does(() => {
     GitReset(".", GitResetMode.Hard);
     StartProcess("git", "stash pop");
 });
+
+Task("nuget-pack").Does(() => {
+    DotNetTool(
+    solution,
+    "pack",
+    $"{project} --output Publish -c release");
+});
+
+Task("nuget-push").Does(() => {
+        var version = gitVersion.NuGetVersion;
+        var apiKey  = EnvironmentVariable("NUGET_TOKEN");
+        var source  = "https://api.nuget.org/v3/index.json";
+        
+        var parameters = $"push \"./Publish/SQLiteUpdater.{version}.nupkg\" --api-key {apiKey} --source {source}";
+
+        DotNetTool(
+            solution,
+            "nuget",
+            parameters 
+        );
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 /// DEPENDENCIES
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,6 +132,15 @@ Task("default")
     .IsDependentOn("restore")
     .IsDependentOn("build")
     .IsDependentOn("test")
+    .IsDependentOn("nuget-pack");
+
+Task("local")
+    .IsDependentOn("default")
+    .IsDependentOn("post-clean");
+
+Task("ci")
+    .IsDependentOn("default")
+    .IsDependentOn("nuget-push")
     .IsDependentOn("post-clean");
 
 RunTarget(target);
