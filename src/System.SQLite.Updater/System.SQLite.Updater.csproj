@@ -7,7 +7,7 @@
         <Authors>JB Wautier</Authors>
         <Description>Opinionated library to automatically update SQLite database</Description>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageId>SQLiteUpdater</PackageId>
+        <PackageId>SQLiteDDLUpdater</PackageId>
         <PackageProjectUrl>https://github.com/jibedoubleve/sqlite-updater</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/jibedoubleve/sqlite-updater/blob/develop/LICENSE</PackageLicenseUrl>
     </PropertyGroup>

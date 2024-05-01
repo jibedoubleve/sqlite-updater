@@ -16,7 +16,7 @@ using Spectre.Console
 ///////////////////////////////////////////////////////////////////////////////
 /// ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
-var repoName = "osteostudio";
+var repoName = "sqlite-updater";
 
 // Paths
 var solution = "./sqlite-updater.sln";
@@ -59,6 +59,11 @@ Setup(ctx => {
     Information("NuGet              Version: {0}", gitVersion.NuGetVersion);
 });
 
+Teardown(context =>
+{
+    GitReset(".", GitResetMode.Hard);
+    StartProcess("git", "stash pop");
+});
 ///////////////////////////////////////////////////////////////////////////////
 /// TASKS
 ///////////////////////////////////////////////////////////////////////////////
@@ -66,7 +71,7 @@ Task("info").Does(()=> {
         /*Does nothing but specifying information of the build*/ 
 });
 
-Task("clean").Does(()=> {
+Task("dn-clean").Does(()=> {
     var dirToDelete = GetDirectories("./**/obj")
                         .Concat(GetDirectories("./**/bin"))
                         .Concat(GetDirectories("./**/Output"))
@@ -79,36 +84,11 @@ Task("clean").Does(()=> {
     DotNetTool(solution, "clean" );
 });
 
-Task("restore").Does(() => DotNetTool(solution, "restore"));
+Task("dn-restore").Does(() => DotNetTool(solution, "restore"));
+Task("dn-build").Does(() => DotNetTool(solution, "build", "--no-restore -c release"));
+Task("dn-test").Does(() => DotNetTool(solution, "test", "--no-restore --no-build -c release"));
 
-Task("build").Does(() => {   
-    DotNetTool(
-        solution,
-        "build",
-        "--no-restore -c release"
-    );
-});
-
-Task("test").Does(() => {
-    DotNetTool(
-        solution,
-        "test",
-        "--no-restore --no-build -c release"
-    );
-});
-
-Task("post-clean").Does(() => {
-    GitReset(".", GitResetMode.Hard);
-    StartProcess("git", "stash pop");
-});
-
-Task("nuget-pack").Does(() => {
-    DotNetTool(
-    solution,
-    "pack",
-    $"{project} --output Publish -c release");
-});
-
+Task("nuget-pack").Does(() => DotNetTool(solution, "pack", $"{project} --output Publish -c release"));
 Task("nuget-push").Does(() => {
         var version = gitVersion.NuGetVersion;
         var apiKey  = EnvironmentVariable("NUGET_TOKEN");
@@ -116,31 +96,47 @@ Task("nuget-push").Does(() => {
         
         var parameters = $"push \"./Publish/SQLiteUpdater.{version}.nupkg\" --api-key {apiKey} --source {source}";
 
-        DotNetTool(
-            solution,
-            "nuget",
-            parameters 
-        );
+        DotNetTool(solution, "nuget", parameters);
 });
 
+Task("github-release").Does(()=> {
+    //https://stackoverflow.com/questions/42761777/hide-services-passwords-in-cake-build
+    var token = EnvironmentVariable("CAKE_PUBLIC_GITHUB_TOKEN");
+    var owner = EnvironmentVariable("CAKE_PUBLIC_GITHUB_USERNAME");
+
+    var alphaVersions = new[] { "alpha", "beta" };
+    var isPrerelease = alphaVersions.Any(x => gitVersion.SemVer.ToLower().Contains(x));
+
+    if(isPrerelease) { Information("This is a prerelease"); }        
+    Information("Has token      : {0}", !string.IsNullOrEmpty(token));
+    Information("Has owner      : {0}", !string.IsNullOrEmpty(owner));
+
+    var parameters = $"create --token {token} -o {owner} -r {repoName} " +
+                     $"--milestone {gitVersion.MajorMinorPatch} --name {gitVersion.SemVer} " +
+                     $"{(isPrerelease ? "--pre" : "")} " +
+                     $"--targetDirectory {Environment.CurrentDirectory} " 
+                     // + "--debug --verbose"
+                     ;
+    DotNetTool( solution, "gitreleasemanager", parameters);
+});
 ///////////////////////////////////////////////////////////////////////////////
 /// DEPENDENCIES
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("default")
-    .IsDependentOn("clean")
-    .IsDependentOn("restore")
-    .IsDependentOn("build")
-    .IsDependentOn("test")
+    .IsDependentOn("dn-clean")
+    .IsDependentOn("dn-restore")
+    .IsDependentOn("dn-build")
+    .IsDependentOn("dn-test")
     .IsDependentOn("nuget-pack");
 
-Task("local")
+Task("ci-dev")
     .IsDependentOn("default")
-    .IsDependentOn("post-clean");
+    .IsDependentOn("github-release");
 
 Task("ci")
     .IsDependentOn("default")
-    .IsDependentOn("nuget-push")
-    .IsDependentOn("post-clean");
+    .IsDependentOn("github-release")
+    .IsDependentOn("nuget-push");
 
 RunTarget(target);
