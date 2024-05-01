@@ -94,7 +94,7 @@ Task("nuget-push").Does(() => {
         var apiKey  = EnvironmentVariable("NUGET_TOKEN");
         var source  = "https://api.nuget.org/v3/index.json";
         
-        var parameters = $"push \"./Publish/SQLiteUpdater.{version}.nupkg\" --api-key {apiKey} --source {source}";
+        var parameters = $"push \"./Publish/SQLiteDDLUpdater.{version}.nupkg\" --api-key {apiKey} --source {source}";
 
         DotNetTool(solution, "nuget", parameters);
 });
