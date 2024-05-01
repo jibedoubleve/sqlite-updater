@@ -18,4 +18,4 @@ jobs:
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
         with:
-          target: ci
+          target: ci-release
