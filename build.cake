@@ -127,16 +127,12 @@ Task("default")
     .IsDependentOn("dn-clean")
     .IsDependentOn("dn-restore")
     .IsDependentOn("dn-build")
-    .IsDependentOn("dn-test")
-    .IsDependentOn("nuget-pack");
+    .IsDependentOn("dn-test");
 
-Task("ci-dev")
+Task("ci-release")
     .IsDependentOn("default")
-    .IsDependentOn("github-release");
-
-Task("ci")
-    .IsDependentOn("default")
-    .IsDependentOn("github-release")
+    .IsDependentOn("github-release")    
+    .IsDependentOn("nuget-pack")
     .IsDependentOn("nuget-push");
 
 RunTarget(target);
